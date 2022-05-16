@@ -1,0 +1,108 @@
+body {
+  background-color: #EDDCD2;
+}
+.App {
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+header {
+  height: 80px;
+  background-color: #EDDCD2;
+  margin-top: 0;
+}
+#header-container {
+  /*background-color: blue;*/
+  width: fit-content;
+  margin-left: 55px;
+}
+
+h1 {  
+  color: rgb(35, 21, 11);
+  font-size: x-large;
+  font-weight: 400;
+  padding-top: 18px;
+}
+
+#top-section-main {
+  background-color: #A5A58D;
+  height: 550px;
+  border: none;
+  padding-top: 5px;
+  padding-left: 30px;
+}
+
+#bottom-section-main {
+  height: 550px;
+  border: none;
+  padding-top: 5px;
+  padding-left: 30px;
+}
+
+#top-section-content {
+  width: 60%;
+}
+
+#bottom-section-content {
+  padding-top: 40px;
+  padding-left: 30px;
+  width: 50%;
+}
+
+#top-section-content p {
+  color: black;
+  font-size: large;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  width: fit-content;
+}
+
+form {
+  font-weight:300;
+  padding-top: 30px;
+  width: 90%;
+  margin: auto;
+}
+
+input {
+  padding: 5px;
+  padding-left: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: rgb(28, 28, 28);
+  color: whitesmoke;
+}
+
+label {
+  color: black;
+}
+
+input[type=file]::file-selector-button {
+  border: none;
+  padding: .2em .4em;
+  border-radius: 5px;
+  background-color: #CB997E;
+  transition: 0.5s;
+}
+
+input[type=file]::file-selector-button:hover {
+  background-color: #EDDCD2;
+}
+
+
+button {
+  height: 40px;
+  width: 100px;
+  border: none;
+  border-radius: 10px;
+  background-color: #CB997E;
+  color: whitesmoke;
+  transition: 0.5s;
+}
+
+button:hover {
+  background-color: darkslategray;
+  color: black;
+}
+
+.App-link {
+  color: #09d3ac;
+}
