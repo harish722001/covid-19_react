@@ -15,13 +15,16 @@ class App extends Component {
       accounts: null, 
       contract: null,
       imgFile: null,
-      imgSrc: null 
+      imgSrc: null,
+      dataIsLoaded: false,
+      result: null 
     };
     
     this.captureFile = this.captureFile.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
-  
+
+  url = 'http://127.0.0.1:5000/predict'
 
   componentDidMount = async () => {
     try {
@@ -79,7 +82,38 @@ class App extends Component {
   }
 
   async onSubmit (event) {
-
+    event.preventDefault()
+    const postData = new FormData();
+    postData.append("file", this.state.imgFile)
+    fetch('http://127.0.0.1:5000/predict',
+    {
+      method: 'POST',
+      mode: 'cors',
+      body: postData
+    }).then(res => 
+      res.json()
+    ).then(
+      data => {
+        let pred = data.prediction[1]
+        console.log(pred)
+        switch(pred){
+          case "0": 
+            pred="positive"
+            break; 
+          case "1": 
+            pred="normal"
+            break;
+          case "2": 
+            pred="cov-negative, lung infected"
+            break;
+          default: pred = data.prediction
+        }
+        this.setState({
+          result: pred,
+          dataIsLoaded: true
+        })
+      }
+    ).catch(error => console.log(error))
   }
 
   render() {
@@ -100,7 +134,7 @@ class App extends Component {
                 <p style={{marginTop:"0"}}>Enter your Name:</p>
                 <input type="text" name="pName" placeholder="Name" size="30" required></input>
                 <p>Enter your Age:</p>
-                <input type="number" name="pAge" placeholder="age" step="1" value="0" min="1" max="150" required></input>
+                <input type="number" name="pAge" placeholder="age" required></input>
                 <p>Which state are you from?</p>
                 <input type="text" name="pLoc" placeholder="State" required></input>
                 <p>Vaccinated?</p>
@@ -125,7 +159,7 @@ class App extends Component {
           <div id="bottom-section-main">
             <div id="bottom-section-content">
               <img src = {this.state.imgSrc} alt="Upload a chest X-Ray" width="200" height="200"></img>
-              <h3>The result will be shown here.</h3>
+              <h3>{this.state.result}</h3>
             </div>
           </div>
         </div>
