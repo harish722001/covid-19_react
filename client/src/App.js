@@ -14,9 +14,10 @@ class App extends Component {
       web3: null, 
       accounts: null, 
       contract: null,
+      pname: "",
       imgFile: null,
       imgSrc: null,
-      dataIsLoaded: false,
+      dataIsLoaded: "",
       result: null 
     };
     
@@ -44,7 +45,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
+      this.setState({ web3, accounts, contract: instance });
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -54,15 +55,15 @@ class App extends Component {
     }
   };
 
-  runExample = async () => {
+  insertToBlockchain = async () => {
     const { accounts, contract } = this.state;
 
-    // Stores a given value, 5 by default.
-    await contract.methods.set("id5645","positive").send({ from: accounts[0] });
+    // Stores a given value
+    await contract.methods.set(this.state.pname,this.state.result).send({ from: accounts[0] });
 
     // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get(3).call();
-
+    const response = await contract.methods.get(0).call();
+    console.log(response.result)
     // Update state with the result.
     this.setState({ storageValue: response.result });
   };
@@ -83,9 +84,11 @@ class App extends Component {
 
   async onSubmit (event) {
     event.preventDefault()
+    console.log(event)
+    this.setState({pname: event.target[0].value})
     const postData = new FormData();
     postData.append("file", this.state.imgFile)
-    fetch('http://127.0.0.1:5000/predict',
+    await fetch('http://127.0.0.1:5000/predict',
     {
       method: 'POST',
       mode: 'cors',
@@ -98,26 +101,45 @@ class App extends Component {
         console.log(pred)
         switch(pred){
           case "0": 
-            pred="positive"
+            pred="covid-19 positive, needs further diagnosis"
             break; 
           case "1": 
-            pred="normal"
+            pred="covid-19 negative, other possible lung infections, needs further diagnosis"
             break;
           case "2": 
-            pred="cov-negative, lung infected"
+            pred="normal, lung not infected"
             break;
-          default: pred = data.prediction
+          default: 
+            this.setState({result: data.prediction})
+            return 
         }
         this.setState({
-          result: pred,
-          dataIsLoaded: true
+          result: data.prediction[1],
+          dataIsLoaded: pred
         })
+        this.insertToBlockchain()
       }
     ).catch(error => console.log(error))
+    let vacc  
+    (event.target[4].checked)? vacc = "Yes" : vacc = "No" 
+    const info = {
+      "age": event.target[2].value,
+      "gender": event.target[1].value.toUpperCase(),
+      "location": event.target[3].value,
+      "vaccination": vacc,
+      "result": this.state.result
+    }
+
+    fetch('https://script.google.com/macros/s/AKfycbzAxKPLbdDDHXonrQhinuD6z-fYUCNcWnBEalG10Qdz0wzmn7noiVcVydMUuyyyRBvalg/exec?action=addUser',
+    {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify(info)
+    }).catch(error => console.log(error))
   }
 
   render() {
-    if (this.state.web3) {  //(!this.state.web3)
+    if (!this.state.web3) {  //(!this.state.web3)
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
@@ -133,6 +155,8 @@ class App extends Component {
               <form id="main-form" onSubmit={this.onSubmit}>
                 <p style={{marginTop:"0"}}>Enter your Name:</p>
                 <input type="text" name="pName" placeholder="Name" size="30" required></input>
+                <p>Enter your Gender:</p>
+                <input type="text" name="pGen" placeholder="Gender" size="30" required></input>
                 <p>Enter your Age:</p>
                 <input type="number" name="pAge" placeholder="age" required></input>
                 <p>Which state are you from?</p>
@@ -159,7 +183,7 @@ class App extends Component {
           <div id="bottom-section-main">
             <div id="bottom-section-content">
               <img src = {this.state.imgSrc} alt="Upload a chest X-Ray" width="200" height="200"></img>
-              <h3>{this.state.result}</h3>
+              <h3>{this.state.dataIsLoaded}</h3>
             </div>
           </div>
         </div>
