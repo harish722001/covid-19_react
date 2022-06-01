@@ -55,17 +55,20 @@ class App extends Component {
     }
   };
 
-  insertToBlockchain = async () => {
+  insertToBlockchain = async (pred) => {
     const { accounts, contract } = this.state;
 
     // Stores a given value
     await contract.methods.set(this.state.pname,this.state.result).send({ from: accounts[0] });
 
     // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get(0).call();
-    console.log(response.result)
+    const response = await contract.methods.get().call();
+    console.log(response)
     // Update state with the result.
-    this.setState({ storageValue: response.result });
+    this.setState({ 
+      storageValue: response.result,
+      dataIsLoaded: pred
+     });
   };
 
   async captureFile (event) {
@@ -110,14 +113,14 @@ class App extends Component {
             pred="normal, lung not infected"
             break;
           default: 
-            this.setState({result: data.prediction})
+            console.log(data.prediction)
+            this.setState({dataIsLoaded: data.prediction})
             return 
         }
         this.setState({
-          result: data.prediction[1],
-          dataIsLoaded: pred
+          result: data.prediction[1]
         })
-        this.insertToBlockchain()
+        this.insertToBlockchain(pred)
       }
     ).catch(error => console.log(error))
     let vacc  

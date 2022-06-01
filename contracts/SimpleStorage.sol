@@ -5,20 +5,21 @@ pragma experimental ABIEncoderV2;
 contract SimpleStorage {
   
   struct Ipfsinfo {
-        string patientId;
+        uint256 patientId;
+        string pname;
         string result;
   }
 
   Ipfsinfo[] public ipfsinfoarr;
   uint256 public arrcount;
 
-  function set(string memory _patientId, string memory _result) public {
-    ipfsinfoarr.push(Ipfsinfo(_patientId, _result));
+  function set(string memory _pname, string memory _result) public {
     arrcount += 1;
+    ipfsinfoarr.push(Ipfsinfo(arrcount, _pname, _result));
   }
 
-  function get(uint _i) public view returns (Ipfsinfo memory) {
-    return ipfsinfoarr[_i];
+  function get() public view returns (Ipfsinfo[] memory) {
+    return ipfsinfoarr;
   }
 
   function getArrSize() public view returns (uint256) {
